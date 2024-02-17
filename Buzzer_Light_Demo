@@ -1,0 +1,29 @@
+#include <math.h>
+
+int thresholdVal = 10;
+int sensorVal, sensorR;
+int count = 0;
+void setup() {
+  Serial.begin(9600);
+  pinMode(6, OUTPUT);  
+}
+
+void loop() {
+  digitalWrite(6, LOW);
+  sensorVal = analogRead(0);
+  delay(500);
+
+  if (sensorVal > 400) {
+    Serial.println("Bright");
+    count = 0;
+  } else {
+    Serial.println("Dark");
+    count++;
+    Serial.println();
+  
+    if (count >= 10){
+      digitalWrite(6, HIGH);
+      delay(50);
+    }
+  }
+}
