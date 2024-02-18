@@ -1,0 +1,94 @@
+#include <Wire.h>
+#include "rgb_lcd.h"
+
+rgb_lcd lcd;
+
+const int thresholdVal = 400, washTime = 10;
+int sensorVal, count = 0, stinky = 0, timeLeft;
+int c = 523 * 2, d = 587*2, e = 659 * 2, f = 698 * 2,  g = 784 * 2, a = 880 * 2;
+
+void myTone(byte pin, uint16_t frequency, uint16_t duration)
+{ // input parameters: Arduino pin number, frequency in Hz, duration in milliseconds
+  unsigned long startTime=millis();
+  unsigned long halfPeriod= 1000000L/frequency/2;
+  pinMode(pin,OUTPUT);
+  while (millis()-startTime< duration)
+  {
+    digitalWrite(pin,HIGH);
+    delayMicroseconds(halfPeriod);
+    digitalWrite(pin,LOW);
+    delayMicroseconds(halfPeriod);
+  }
+  pinMode(pin,INPUT);
+}
+
+void notePlayer(int note, int time){
+  myTone(6, note, time);
+  delay(100);
+}
+
+
+void setup() {
+  Serial.begin(9600);
+  lcd.begin(16, 2);
+  void display();				// turn on display  
+  void clear();
+  pinMode(6, OUTPUT);
+  lcd.setRGB(255, 255, 255);
+  lcd.print("Waiting...");
+  delay(3000);
+}
+
+void loop() {
+  sensorVal = analogRead(0);
+
+  if (sensorVal > thresholdVal) {
+    if (count < 10){
+    count++;
+    lcd.clear();
+    lcd.setRGB(255, 200, 0);
+    lcd.print("Wash hands for:");
+    lcd.setCursor(0, 1);
+    timeLeft = washTime - count;
+    lcd.print(timeLeft);
+    }
+
+    else{
+      count++;
+      lcd.clear();
+      lcd.setRGB(0, 255, 0);
+      lcd.print("Enough Washing!");
+      lcd.setCursor(0, 1);
+      lcd.print("put it down!");
+    }
+  }  
+  else{
+    if (count != -1 && count < washTime) {
+      do{
+        sensorVal = analogRead(0);  
+        // stinky
+        lcd.clear();
+        lcd.setRGB(255,0,0);
+        lcd.print("Bad! Stinky!!");
+        notePlayer(g, 100);
+        delay(50);
+        notePlayer(c, 100);
+        Serial.println("in here!");
+        }while(sensorVal < thresholdVal);
+      }
+
+
+    else if(count != -1){
+      lcd.clear();
+      lcd.setRGB(0, 255, 0);
+      lcd.print("Good Job!");
+      lcd.setCursor(0, 1);
+      lcd.print("On Standby...");
+      count = 0;
+      delay(1000);
+    }
+    count = -1;
+  }
+  Serial.println(count);
+  delay(1000);
+}
