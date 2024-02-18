@@ -1,0 +1,45 @@
+	#define BUZZER 5
+
+void myTone(byte pin, uint16_t frequency, uint16_t duration)
+{ // input parameters: Arduino pin number, frequency in Hz, duration in milliseconds
+  unsigned long startTime=millis();
+  unsigned long halfPeriod= 1000000L/frequency/2;
+  pinMode(pin,OUTPUT);
+  while (millis()-startTime< duration)
+  {
+    digitalWrite(pin,HIGH);
+    delayMicroseconds(halfPeriod);
+    digitalWrite(pin,LOW);
+    delayMicroseconds(halfPeriod);
+  }
+  pinMode(pin,INPUT);
+}
+
+void notePlayer(int note, int time){
+  myTone(6, note, time);
+  delay(100);
+}
+void setup()
+{  
+}
+ 
+void loop()
+{
+  int c = 523 * 2, d = 587*2, e = 659 * 2, f = 698 * 2,  g = 784 * 2, a = 880 * 2;
+  notePlayer(c, 500);
+  notePlayer(c, 500);
+  notePlayer(g, 500);
+  notePlayer(g, 500);
+  notePlayer(a, 500);
+  notePlayer(a, 500);
+  notePlayer(g, 1000);
+  notePlayer(f, 500);
+  notePlayer(f, 500);
+  notePlayer(e, 500);
+  notePlayer(e, 500);
+  notePlayer(d, 500);
+  notePlayer(d, 500);
+  notePlayer(c, 1000);
+
+
+}
